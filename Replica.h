@@ -1,11 +1,14 @@
-# include <iostream>
+#include <iostream>
+#include <Eigen/Dense>
+
+using namespace Eigen;
 
 class Replica
 {
 private:
-    const int ham;  // Hamiltonian for the replica
+    MatrixXd ham;  // Hamiltonian for the replica
 public:
-    Replica(const int state_in);
-    const int Ham();
+    Replica(MatrixXd & ham_in);
+    MatrixXd Ham();
     ~Replica();
 };

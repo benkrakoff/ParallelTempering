@@ -1,13 +1,17 @@
 #include "Replica.h"
+#include <Eigen/Dense>
 
-Replica::Replica(const int ham_in) : ham{ham_in}
+using namespace Eigen;
+
+Replica::Replica(MatrixXd & ham_in)
 {
+    ham = ham_in;
 }
 
 Replica::~Replica()
 {
 }
 
-const int Replica::Ham(){
+MatrixXd Replica::Ham(){
     return ham;
 }
