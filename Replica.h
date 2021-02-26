@@ -3,16 +3,9 @@
 class Replica
 {
 private:
-    /* data */
+    const int ham;  // Hamiltonian for the replica
 public:
-    Replica(/* args */);
+    Replica(const int state_in);
+    const int Ham();
     ~Replica();
 };
-
-Replica::Replica(/* args */)
-{
-}
-
-Replica::~Replica()
-{
-}
