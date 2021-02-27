@@ -8,16 +8,19 @@ using namespace std;
 int main(int argc, char * args[]){
 
     //Initialization tests
+    double temp = 1.0;
     const MatrixXd test_ham(2, 2);
     const string ISING = "ISING";
     const string BINARY = "BINARY";
-    Replica * ising_test = new Replica(test_ham, ISING);
-    Replica * binary_test = new Replica(test_ham, BINARY);
+    Replica * ising_test = new Replica(test_ham, temp, ISING);
+    Replica * binary_test = new Replica(test_ham, temp, BINARY);
 
     assert(ising_test->ham(0, 0) == 0.0);
     cout << "Hamiltonian Initialization Passed!\n";
     assert(ising_test->state(0) == 1.0);
     cout << "State Initialization Passed!\n";
+    assert(ising_test->temp == 1.0);
+    cout << "Temperature Initialization Passed!\n";
     assert(ising_test->get_energy() == 0.0);
     cout <<"Energy Initialization Passed!\n";
 

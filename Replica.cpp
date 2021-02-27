@@ -7,7 +7,7 @@ using namespace Eigen;
 const std::string Replica::ISING = "ISING";
 const std::string Replica::BINARY = "BINARY";
 
-Replica::Replica(const MatrixXd &ham_in, const std::string &vartype_in) :ham{ham_in}, vartype{vartype_in}
+Replica::Replica(const MatrixXd &ham_in, double temp_in, const std::string &vartype_in) :ham{ham_in}, temp{temp_in}, vartype{vartype_in}
 {
     state = VectorXd::Constant(ham_in.rows(), 1.0);
     energy = state.dot(ham*state);
@@ -17,14 +17,23 @@ double Replica::get_energy(){
     return energy;
 }
 
-void Replica::step(int node){
+void Replica::flip(int node){
     if(vartype.compare(ISING) == 0){
         state(node) = -1*state(node);
     } else {
         state(node) = 1.0-state(node);
     }
+}
+
+void Replica::step(int node){
+    flip(node);
     // TO DO: OPTIMIZE THIS STEP
-    energy = state.dot(ham*state);
+    double new_energy = state.dot(ham*state);
+    if ( rand() / double(RAND_MAX) < exp((energy - new_energy)/temp)){
+        energy = new_energy;
+    } else {
+        flip(node);
+    }
 }
 
 void Replica::step(){
