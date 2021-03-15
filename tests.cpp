@@ -1,6 +1,8 @@
 #include "Replica.h"
 #include <iostream>
+#include <iomanip>
 #include <assert.h>
+#include <time.h>
 
 using namespace Eigen;
 using namespace std;
@@ -30,8 +32,21 @@ int main(int argc, char * args[]){
     ising_test->step();
     binary_test->step(0);
     assert(binary_test->state(0) == 0.0);
-    binary_test->step(0);
+    binary_test->step();
     cout << "Metropolis steps working!\n";
+
+    //How long a 1e6 steps take
+    clock_t begin = clock();
+    for (size_t i = 0; i < 1000000; i++)
+    {
+        ising_test->step();
+        binary_test->step();
+    }
+    clock_t end = clock();
+    float time = (float(end) - float(begin))/2;
+    cout << fixed;
+    cout << setprecision (8);
+    cout << "10^6 Metropolis Steps in " << time/CLOCKS_PER_SEC << " s\n";
 
     return 0;
 }
