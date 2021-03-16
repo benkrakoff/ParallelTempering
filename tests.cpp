@@ -1,3 +1,4 @@
+#include "ParallelTemper.h"
 #include "Replica.h"
 #include <iostream>
 #include <iomanip>
@@ -48,5 +49,10 @@ int main(int argc, char * args[]){
     cout << setprecision (8);
     cout << "10^6 Metropolis Steps in " << time/CLOCKS_PER_SEC << " s\n";
 
+    //Testing ParallelTemper
+    const std::string test_file("test_ham.mtx");
+    VectorXd state = Temper(test_file);
+    assert(state(0) == 1.0);
+    cout << "Ham file reading!\n";
     return 0;
 }

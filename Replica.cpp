@@ -1,6 +1,4 @@
 #include "Replica.h"
-#include <Eigen/Dense>
-#include <stdlib.h>
 
 using namespace Eigen;
 

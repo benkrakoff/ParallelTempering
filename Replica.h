@@ -1,8 +1,9 @@
+#ifndef REPLICA_H
+#define REPLICA_H
 #include <iostream>
 #include <Eigen/Dense>
 
 using namespace Eigen;
-
 
 class Replica
 {
@@ -23,3 +24,5 @@ public:
     void step(int node);
     ~Replica();
 };
+
+#endif
