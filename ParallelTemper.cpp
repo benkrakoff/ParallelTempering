@@ -5,6 +5,7 @@ Eigen::VectorXd Temper(const std::string & test_file, const std::string &vartype
     std::ifstream mtx_file;
     mtx_file.open(test_file); 
     const Eigen::MatrixXd ham = read_ham(mtx_file);
+    mtx_file.close();
 
     //Initialize replicas at stated temperatures
     Replica * replica[num_replicas];
@@ -14,28 +15,37 @@ Eigen::VectorXd Temper(const std::string & test_file, const std::string &vartype
     }
     
     // Parallel temper, recording swaps
-    int steps = int(pow(replica[0]->ham.rows(), 2));
+    int steps = replica[0]->ham.rows();
     for (int i = 0; i < steps; i++)
     {   
-        std::thread threads[num_replicas];
+        std::vector<std::thread> threads;
         //Initialize threads
         for (int j = 0; j < num_replicas; j++)
         {
-            threads[j] = std::thread(TemperReplica, replica[i]);
+            threads.push_back(std::thread(TemperReplica, replica[j]));
         }
         //Wait to finish
-        for (int j = 0; j < num_replicas; j++)
+        std::for_each(threads.begin(), threads.end(), [](std::thread &t) 
         {
-            threads[j].join();
-        }
+            t.join();
+        });
 
-        //TODO: PT Step
+        //Metropolis swap step
+        int swap = rand() % (num_replicas-1);
+        double temp_diff = 1.0/replica[swap]->temp - 1.0/replica[swap+1]->temp;
+        double energy_diff = replica[swap+1]->get_energy() - replica[swap]->get_energy();
+        double probability = exp(temp_diff*energy_diff);
+        if (rand() / double(RAND_MAX) < probability){
+            Replica * temp = replica[swap];
+            replica[swap] = replica[swap+1];
+            replica[swap+1] = temp;
+        }
     }
     
     // Save lowest energy state, delete replicas
     double lowest_energy = replica[0]->get_lowest_energy();
     Eigen::VectorXd lowest_state = replica[0]->lowest_state;
-    for (int i = 1; i < num_replicas; i++)
+    for (int i = 0; i < num_replicas; i++)
     {
         if (replica[i]->get_lowest_energy() < lowest_energy){
             lowest_energy = replica[i]->get_lowest_energy();
@@ -43,13 +53,11 @@ Eigen::VectorXd Temper(const std::string & test_file, const std::string &vartype
         }
         delete replica[i];
     }
-
     return lowest_state;
-
 }
 
-void TemperReplica(Replica *replica){
-    int steps = int(pow(replica->ham.rows(), 2));
+void TemperReplica(Replica * replica){
+    int steps = replica->ham.rows();
     for (int i = 0; i < steps; i++)
     {
         replica->step();
@@ -64,6 +72,7 @@ const Eigen::MatrixXd read_ham(std::ifstream & mtx_file){
     mtx_file >> rows >> cols >> entries;
 
     Eigen::MatrixXd ham(rows, cols);
+    ham = MatrixXd::Zero(rows, cols);
 
     while(mtx_file.peek() != EOF){
         int i, j;

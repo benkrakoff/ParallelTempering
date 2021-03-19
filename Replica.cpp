@@ -23,7 +23,7 @@ double Replica::get_lowest_energy(){
 
 void Replica::flip(int node){
     if(vartype.compare(ISING) == 0){
-        state(node) = -1*state(node);
+        state(node) = -1.0*state(node);
     } else {
         state(node) = 1.0-state(node);
     }
